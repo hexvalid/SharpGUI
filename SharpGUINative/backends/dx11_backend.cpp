@@ -56,7 +56,7 @@ HRESULT __stdcall Backends::DX11::hkPresent(IDXGISwapChain* pSwapChain, UINT Syn
 	if (!Backends::DX11::hookInit)
 	{
 		// Return if we can't get the device
-		if (!SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&Backends::DX11::pDevice)))
+		if (!SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&Backends::DX11::pDevice)) || Backends::DX11::pDevice == nullptr)
 		{
 			return Backends::DX11::oPresent(pSwapChain, SyncInterval, Flags);
 		}
@@ -96,6 +96,11 @@ HRESULT __stdcall Backends::DX11::hkPresent(IDXGISwapChain* pSwapChain, UINT Syn
 
 HRESULT __stdcall Backends::DX11::hkResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
+	if (!Backends::DX11::hookInit)
+	{
+		return Backends::DX11::oResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+	}
+
 	if (Backends::DX11::pMainRenderTargetView)
 	{
 		Backends::DX11::pContext->OMSetRenderTargets(0, NULL, NULL);

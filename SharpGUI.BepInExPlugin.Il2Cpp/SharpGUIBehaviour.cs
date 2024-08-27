@@ -4,7 +4,7 @@ using UnityEngine;
 
 using SGUI = SharpGUI.GUI;
 
-namespace SharpGUIPlugin;
+namespace SharpGUI.BepInExPlugin.Il2Cpp;
 
 public class SharpGUIBehaviour(IntPtr basePtr) : MonoBehaviour(basePtr)
 {
@@ -17,6 +17,11 @@ public class SharpGUIBehaviour(IntPtr basePtr) : MonoBehaviour(basePtr)
 	{
 		SGUI.OnRender += GUI_OnRender;
 		SGUI.Initialize();
+	}
+
+	private void OnApplicationQuit()
+	{
+		SGUI.Shutdown();
 	}
 
 	void DrawIntro()

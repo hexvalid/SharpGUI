@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFrameworks>net6.0-windows;net472</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -17,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\SharpGUINative\cimgui\cimgui.dll" Link="Resources\cimgui.dll" />
+    <EmbeddedResource Include="..\deps\cimgui\cimgui.dll" Link="Resources\cimgui.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,7 +36,7 @@
 
   <ItemGroup>
     <Reference Include="ImGui.NET">
-      <HintPath>Resources/ImGui.NET.dll</HintPath>
+      <HintPath>../deps/ImGui.NET/$(TargetFramework)/ImGui.NET.dll</HintPath>
     </Reference>
   </ItemGroup>
 

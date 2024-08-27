@@ -1,6 +1,6 @@
 #include "sharpconfig.hpp"
 
-#if SHARPGUI_INCLUDE_DX11
+#if SHARPGUI_INCLUDE_DX12
 
 #include "backends.hpp"
 #include "dx12_backend.hpp"

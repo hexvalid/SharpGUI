@@ -79,12 +79,30 @@ case enumName:															\
 
 	switch (type)
 	{
+
+#if SHARPGUI_INCLUDE_DX9
 		CHECK_TYPE(Backends::BackendType::BackendType_DX9, Backends::DX9Backend)
+#endif
+
+#if SHARPGUI_INCLUDE_DX10
 		CHECK_TYPE(Backends::BackendType::BackendType_DX10, Backends::DX10Backend)
+#endif
+
+#if SHARPGUI_INCLUDE_DX11
 		CHECK_TYPE(Backends::BackendType::BackendType_DX11, Backends::DX11Backend)
+#endif
+
+#if SHARPGUI_INCLUDE_DX12
 		CHECK_TYPE(Backends::BackendType::BackendType_DX12, Backends::DX12Backend)
+#endif
+
+#if SHARPGUI_INCLUDE_OPENGL
 		CHECK_TYPE(Backends::BackendType::BackendType_OpenGL, Backends::OpenGLBackend)
+#endif
+
+#if SHARPGUI_INCLUDE_OVERLAY
 		CHECK_TYPE(Backends::BackendType::BackendType_Overlay, Backends::OverlayBackend)
+#endif
 
 	default:
 		break;
