@@ -19,4 +19,7 @@ extern "C"
 
 	__declspec(dllexport) bool __stdcall GetHandleInput();
 	__declspec(dllexport) void __stdcall SetHandleInput(bool handleInput);
+
+	__declspec(dllexport) bool __stdcall GetBlockInput();
+	__declspec(dllexport) void __stdcall SetBlockInput(bool blockInput);
 }

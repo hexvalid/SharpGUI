@@ -28,12 +28,10 @@ internal class GUIHelper
 	{
 		string libraryPath = Path.Combine(nativesFolder, name);
 
-#if DEBUG
 		CopyResource(name, libraryPath);
-#else
+
 		if (!File.Exists(libraryPath))
 			CopyResource(name, libraryPath);
-#endif
 
 		LoadedLibraries.Add(PInvoke.LoadLibrary(libraryPath));
 	}

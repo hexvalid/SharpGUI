@@ -15,4 +15,7 @@ namespace SharpGUI
 
 	void SetHandleInput(bool handleInput);
 	bool GetHandleInput();
+
+	void SetBlockInput(bool blockInput);
+	bool GetBlockInput();
 }

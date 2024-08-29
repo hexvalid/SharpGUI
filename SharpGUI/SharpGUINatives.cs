@@ -23,4 +23,7 @@ internal class SharpGUINatives
 	[DllImport("SharpGUINative")]
 	internal static extern void SetHandleInput([MarshalAs(UnmanagedType.Bool)] bool handleInput);
 
+	[DllImport("SharpGUINative")]
+	internal static extern void SetBlockInput([MarshalAs(UnmanagedType.Bool)] bool blockInput);
+
 }

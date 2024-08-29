@@ -18,7 +18,22 @@ public class GUI
 		}
 	}
 
+	public static bool BlockInput
+	{
+		get
+		{
+			return _BlockInput;
+		}
+		set
+		{
+			_BlockInput = value;
+			SharpGUINatives.SetBlockInput(value);
+		}
+	}
+
+
 	private static bool _HandleInput;
+	private static bool _BlockInput;
 
 	private static void PrepareInit()
 	{

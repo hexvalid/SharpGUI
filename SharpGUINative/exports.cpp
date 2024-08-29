@@ -41,3 +41,13 @@ void __stdcall SetHandleInput(bool handleInput)
 {
 	SharpGUI::SetHandleInput(handleInput);
 }
+
+bool __stdcall GetBlockInput()
+{
+	return SharpGUI::GetBlockInput();
+}
+
+void __stdcall SetBlockInput(bool blockInput)
+{
+	SharpGUI::SetBlockInput(blockInput);
+}

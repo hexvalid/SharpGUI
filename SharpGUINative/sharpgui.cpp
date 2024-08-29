@@ -170,3 +170,20 @@ bool SharpGUI::GetHandleInput()
 
 	return Backends::currentBackend->GetHandleInput();
 }
+
+void SharpGUI::SetBlockInput(bool blockInput)
+{
+	if (Backends::currentBackend != nullptr && !Backends::currentBackend->IsInitialized())
+		return;
+
+	Backends::currentBackend->SetBlockInput(blockInput);
+}
+
+bool SharpGUI::GetBlockInput()
+{
+	if (Backends::currentBackend != nullptr && !Backends::currentBackend->IsInitialized())
+		return false;
+
+	return Backends::currentBackend->GetBlockInput();
+}
+

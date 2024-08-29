@@ -23,7 +23,10 @@ typedef HCURSOR(WINAPI* SetCursorDef)(HCURSOR hCursor);
 namespace Backends::Win32
 {
 	bool initialized = false;
+
 	bool handleInput = false;
+	bool blockInput = false;
+
 	HWND window = NULL;
 
 	WNDPROC oWndProc = nullptr;
@@ -124,7 +127,7 @@ bool Backends::Win32::IsImguiCursor(HCURSOR hCursor)
 
 bool WINAPI Backends::Win32::hkGetCursorPos(LPPOINT lpPoint)
 {
-	if (Backends::Win32::handleInput)
+	if (Backends::Win32::blockInput)
 	{
 		if (lpPoint != nullptr)
 		{
@@ -139,7 +142,7 @@ bool WINAPI Backends::Win32::hkGetCursorPos(LPPOINT lpPoint)
 
 bool WINAPI Backends::Win32::hkSetCursorPos(int X, int Y)
 {
-	if (Backends::Win32::handleInput)
+	if (Backends::Win32::blockInput)
 	{
 		Backends::Win32::cursorPos.x = X;
 		Backends::Win32::cursorPos.y = Y;
@@ -154,7 +157,7 @@ int WINAPI Backends::Win32::hkShowCursor(bool bShow)
 {
 	Backends::Win32::cursorVisible = bShow;
 
-	if (Backends::Win32::handleInput)
+	if (Backends::Win32::blockInput)
 	{
 		return ShowMouseCursor();
 	}
@@ -174,7 +177,7 @@ BOOL WINAPI Backends::Win32::hkClipCursor(const RECT* lpRect)
 		Backends::Win32::cursorClip.bottom = lpRect->bottom;
 	}
 
-	if (Backends::Win32::handleInput)
+	if (Backends::Win32::blockInput)
 	{
 		return true;
 	}
@@ -184,7 +187,7 @@ BOOL WINAPI Backends::Win32::hkClipCursor(const RECT* lpRect)
 
 BOOL WINAPI Backends::Win32::hkGetClipCursor(LPRECT lpRect)
 {
-	if (Backends::Win32::handleInput)
+	if (Backends::Win32::blockInput)
 	{
 		*lpRect = Backends::Win32::cursorClip;
 		return true;
@@ -195,7 +198,7 @@ BOOL WINAPI Backends::Win32::hkGetClipCursor(LPRECT lpRect)
 
 HCURSOR WINAPI Backends::Win32::hkGetCursor()
 {
-	if (Backends::Win32::handleInput)
+	if (Backends::Win32::blockInput)
 		return Backends::Win32::cursor;
 
 	return oGetCursor();
@@ -206,7 +209,7 @@ HCURSOR WINAPI Backends::Win32::hkSetCursor(HCURSOR hCursor)
 	HCURSOR oldCursor = Backends::Win32::cursor;
 	Backends::Win32::cursor = hCursor;
 
-	if (Backends::Win32::handleInput && !IsImguiCursor(hCursor))
+	if (Backends::Win32::blockInput && !IsImguiCursor(hCursor))
 	{
 		return oldCursor;
 	}
@@ -216,7 +219,8 @@ HCURSOR WINAPI Backends::Win32::hkSetCursor(HCURSOR hCursor)
 
 LRESULT __stdcall Backends::Win32::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (Backends::Win32::handleInput)
+	bool callOriginal = true;
+	if (Backends::Win32::blockInput)
 	{
 		// Init cursor
 		if (Backends::Win32::initCursor)
@@ -232,11 +236,6 @@ LRESULT __stdcall Backends::Win32::WndProc(const HWND hWnd, UINT uMsg, WPARAM wP
 		}
 
 		oClipCursor(nullptr);
-
-		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-			return true;
-
-		bool callOriginal = false;
 
 		switch (uMsg)
 		{
@@ -276,26 +275,6 @@ LRESULT __stdcall Backends::Win32::WndProc(const HWND hWnd, UINT uMsg, WPARAM wP
 		default:
 			break;
 		}
-
-		if (callOriginal)
-			return CallWindowProc(Backends::Win32::oWndProc, hWnd, uMsg, wParam, lParam);
-		else
-			return true;
-	}
-
-	// Handle input keys when handleInput is false to still detect if a key is pressed
-	switch (uMsg)
-	{
-	case WM_CHAR:
-	case WM_KEYDOWN:
-	case WM_KEYUP:
-	case WM_SYSKEYDOWN:
-	case WM_SYSKEYUP:
-		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
-		break;
-
-	default:
-		break;
 	}
 
 	if (Backends::Win32::resetCursorState)
@@ -316,7 +295,33 @@ LRESULT __stdcall Backends::Win32::WndProc(const HWND hWnd, UINT uMsg, WPARAM wP
 		Backends::Win32::resetCursorState = false;
 	}
 
-	return CallWindowProc(Backends::Win32::oWndProc, hWnd, uMsg, wParam, lParam);
+	if (Backends::Win32::handleInput)
+	{
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+			return true;
+	}
+	else
+	{
+		// Handle input keys when handleInput is false to still detect if a key is pressed
+		switch (uMsg)
+		{
+		case WM_CHAR:
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+		case WM_SYSKEYDOWN:
+		case WM_SYSKEYUP:
+			ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	if (callOriginal)
+		return CallWindowProc(Backends::Win32::oWndProc, hWnd, uMsg, wParam, lParam);
+	else
+		return true;
 }
 
 void Backends::Win32Backend::SetHandleInput(bool handleInput)
@@ -326,8 +331,17 @@ void Backends::Win32Backend::SetHandleInput(bool handleInput)
 
 	this->handleInput = handleInput;
 	Backends::Win32::handleInput = handleInput;
+}
 
-	if (handleInput)
+void Backends::Win32Backend::SetBlockInput(bool blockInput)
+{
+	if (Backends::Win32::blockInput == blockInput)
+		return;
+
+	this->blockInput = blockInput;
+	Backends::Win32::blockInput = blockInput;
+
+	if (blockInput)
 	{
 		Backends::Win32::cursorVisible = Backends::Win32::IsCursorVisible();
 		Backends::Win32::oGetCursorPos(&Backends::Win32::cursorPos);

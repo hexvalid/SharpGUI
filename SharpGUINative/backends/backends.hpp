@@ -25,12 +25,17 @@ namespace Backends
 
 		virtual void SetHandleInput(bool handleInput) {}
 		virtual bool GetHandleInput();
+
+		virtual void SetBlockInput(bool blockInput) {}
+		virtual bool GetBlockInput();
 	protected:
 		virtual void InitializeBackend() {}
 		virtual void ShutdownBackend() {}
 
 		bool initialized;
+
 		bool handleInput;
+		bool blockInput;
 	};
 
 	extern Backend* currentBackend;

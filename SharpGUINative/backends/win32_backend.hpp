@@ -10,6 +10,7 @@ namespace Backends
 	{
 	public:
 		void SetHandleInput(bool handleInput) override;
+		void SetBlockInput(bool blockInput) override;
 	};
 
 	namespace Win32

@@ -49,6 +49,11 @@ bool Backends::Backend::GetHandleInput()
 	return this->handleInput;
 }
 
+bool Backends::Backend::GetBlockInput()
+{
+	return this->blockInput;
+}
+
 void Backends::InitImGui()
 {
 	igCreateContext(nullptr);
